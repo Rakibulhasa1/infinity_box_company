@@ -2,18 +2,27 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:infinity_box/constant/color.dart';
+import 'package:infinity_box/screeen/cart_list.dart';
 import 'package:infinity_box/screeen/product_details_screen.dart';
 import 'package:infinity_box/screeen/search_screen.dart';
 import 'package:infinity_box/widgets/shimmer_effect.dart';
 
+import '../model/product_view_model.dart';
 import '../services/product_service.dart';
 
-class ProductListScreen extends StatelessWidget {
+class ProductListScreen extends StatefulWidget {
   const ProductListScreen({
     super.key,
   });
 
+  @override
+  State<ProductListScreen> createState() => _ProductListScreenState();
+}
+
+class _ProductListScreenState extends State<ProductListScreen> {
+  ProductViewModel productViewModel = Get.put(ProductViewModel());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,12 +44,21 @@ class ProductListScreen extends StatelessWidget {
               icon: Icon(
                 CupertinoIcons.search,
               )),
-          IconButton(
-              onPressed: () {},
-              icon: Icon(
-                CupertinoIcons.cart_badge_plus,
-                size: 26,
-              ))
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => CartList()));
+            },
+            child: Container(
+              padding: EdgeInsets.all(8),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.shopping_cart),
+                  Obx(() => Text(productViewModel.count.toString()))
+                ],
+              ),
+            ),
+          )
         ],
       ),
       body: Padding(
@@ -52,9 +70,9 @@ class ProductListScreen extends StatelessWidget {
               return GridView.builder(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
                   maxCrossAxisExtent: 200,
-                  childAspectRatio: 1,
+                  childAspectRatio: 0.8,
                   crossAxisSpacing: 10,
-                  mainAxisSpacing: 5,
+                  mainAxisSpacing: 10,
                 ),
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
@@ -71,7 +89,7 @@ class ProductListScreen extends StatelessWidget {
                         children: [
                           SizedBox(height: 15),
                           Image.network(snapshot.data[index]['image'],
-                              width: 65),
+                              width: 85),
                           Expanded(child: Container()),
                           Text(
                             snapshot.data[index]['category'],

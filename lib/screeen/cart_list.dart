@@ -61,11 +61,36 @@ class _CartListState extends State<CartList> {
                                           image: NetworkImage(productViewModel
                                               .cartList[index].image!))),
                                 ),
+                                SizedBox(
+                                  width: 8,
+                                ),
                                 Expanded(
-                                  child: Container(
-                                    child: Text(
-                                      productViewModel.cartList[index].title!,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        child: Text(
+                                          productViewModel
+                                              .cartList[index].title!,
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Text(
+                                          "Rs." +
+                                              productViewModel
+                                                  .productList[index].price!
+                                                  .toString(),
+                                          style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 InkWell(
@@ -77,20 +102,11 @@ class _CartListState extends State<CartList> {
                                     margin: EdgeInsets.all(8.0),
                                     child: Icon(
                                       Icons.delete_outline_sharp,
-                                      color: Colors.red,
+                                      color: maincolor,
                                     ),
                                   ),
                                 )
                               ],
-                            ),
-                            Container(
-                              child: Text(
-                                "Rs." +
-                                    productViewModel.productList[index].price!
-                                        .toString(),
-                                style: TextStyle(
-                                    fontSize: 20, fontWeight: FontWeight.bold),
-                              ),
                             ),
                             Divider(),
                           ],
@@ -99,7 +115,7 @@ class _CartListState extends State<CartList> {
               Positioned(
                 bottom: 100,
                 child: Card(
-                  color: Colors.brown,
+                  color: maincolor,
                   child: Container(
                       padding: EdgeInsets.all(16),
                       child: Obx(() => Column(
