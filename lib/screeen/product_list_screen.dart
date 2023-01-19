@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:badges/badges.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -50,16 +51,24 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   context, MaterialPageRoute(builder: (context) => CartList()));
             },
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.only(right: 18),
               child: Row(
                 children: <Widget>[
-                  Icon(Icons.shopping_cart),
-                  Obx(() => Text(productViewModel.count.toString()))
+                  Badge(
+                      badgeColor: Colors.green,
+                      badgeContent: Obx(
+                        () => Text(
+                          productViewModel.count.toString(),
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      child: Icon(Icons.shopping_cart)),
                 ],
               ),
             ),
           )
         ],
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),

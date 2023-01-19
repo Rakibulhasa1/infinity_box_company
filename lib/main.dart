@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:infinity_box/screeen/splash_scren.dart';
 
-import 'screeen/product_list_screen.dart';
-
 void main() {
   runApp(const MyApp());
 }

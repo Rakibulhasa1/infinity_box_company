@@ -1,188 +1,214 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, sort_child_properties_last
 
 import 'package:flutter/material.dart';
+import 'package:infinity_box/constant/color.dart';
 import 'package:infinity_box/screeen/product_list_screen.dart';
 
-import '../widgets/squre_tile.dart';
-import '../widgets/textfield.dart';
+import '../auth_api/api_service.dart';
+import '../model/login_model.dart';
+import '../widgets/progress.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
 
-  // text editing controllers
-  final usernameController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  // sign user in method
-  void signUserIn() {}
+class _LoginPageState extends State<LoginPage> {
+  bool hidePassword = true;
+  bool isApiCallProcess = false;
+  GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  late LoginRequestModel loginRequestModel;
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+  @override
+  void initState() {
+    super.initState();
+    loginRequestModel = LoginRequestModel();
+  }
 
   @override
   Widget build(BuildContext context) {
+    return ProgressHUD(
+      child: _uiSetup(context),
+      inAsyncCall: isApiCallProcess,
+      opacity: 0.3,
+    );
+  }
+
+  Widget _uiSetup(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
-        child: Center(
-          child: ListView(
-            //  mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(height: 50),
-
-              // logo
-              const Icon(
-                Icons.lock,
-                size: 100,
-              ),
-
-              const SizedBox(height: 50),
-
-              // welcome back, you've been missed!
-              // Text(
-              //   'Welcome back you\'ve been missed!',
-              //   style: TextStyle(
-              //     color: Colors.grey[700],
-              //     fontSize: 16,
-              //   ),
-              // ),
-
-              const SizedBox(height: 25),
-
-              // username textfield
-              MyTextField(
-                controller: usernameController,
-                hintText: 'Username',
-                obscureText: false,
-              ),
-
-              const SizedBox(height: 20),
-
-              // password textfield
-              MyTextField(
-                controller: passwordController,
-                hintText: 'Password',
-                obscureText: true,
-              ),
-
-              const SizedBox(height: 10),
-
-              // forgot password?
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      'Forgot Password?',
-                      style: TextStyle(
-                        color: Color.fromRGBO(215, 19, 101, 1),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 25),
-
-              // sign in button
-              // MyButton(
-              //   onTap: signUserIn,
-              // ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductListScreen()));
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(25),
-                  margin: const EdgeInsets.symmetric(horizontal: 25),
+      backgroundColor: Color.fromARGB(255, 241, 240, 240),
+      key: scaffoldKey,
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            SizedBox(
+              height: 50,
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height / 2,
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 30, horizontal: 20),
+                  margin: EdgeInsets.symmetric(vertical: 85, horizontal: 20),
                   decoration: BoxDecoration(
-                    color: Color.fromRGBO(215, 19, 101, 1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(20),
+                    color: maincolor,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Theme.of(context).hintColor.withOpacity(0.2),
+                          offset: Offset(0, 10),
+                          blurRadius: 20)
+                    ],
                   ),
-                  child: const Center(
-                    child: Text(
-                      "Sign In",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                  child: Form(
+                    key: globalFormKey,
+                    child: Column(
+                      children: <Widget>[
+                        SizedBox(height: 25),
+                        Text(
+                          "Login",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 38,
+                              color: Colors.white),
+                        ),
+                        Expanded(child: Container()),
+                        TextFormField(
+                          style: TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.emailAddress,
+                          onSaved: (input) => loginRequestModel.email = input,
+                          validator: (input) => !input!.contains('@')
+                              ? "Email Id should be valid"
+                              : null,
+                          decoration: InputDecoration(
+                            hintText: "Email Address",
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.redAccent)),
+                            prefixIcon: Icon(
+                              Icons.email,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                        TextFormField(
+                          style: TextStyle(color: Colors.white),
+                          keyboardType: TextInputType.text,
+                          onSaved: (input) =>
+                              loginRequestModel.password = input,
+                          validator: (input) => input!.length < 8
+                              ? "Password should be more than 8 characters"
+                              : null,
+                          obscureText: hidePassword,
+                          decoration: InputDecoration(
+                            hintText: "Password",
+                            enabledBorder: UnderlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white)),
+                            focusedBorder: UnderlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.redAccent)),
+                            prefixIcon: Icon(
+                              Icons.lock,
+                              color: Colors.white,
+                            ),
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  hidePassword = !hidePassword;
+                                });
+                              },
+                              color: Colors.white,
+                              icon: Icon(hidePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 1,
+                          child: ElevatedButton(
+                            // padding: EdgeInsets.symmetric(
+                            //     vertical: 12, horizontal: 80),
+                            onPressed: () {
+                              if (validateAndSave()) {
+                                print(loginRequestModel.toJson());
+
+                                setState(() {
+                                  isApiCallProcess = true;
+                                });
+
+                                APIService apiService = APIService();
+                                apiService
+                                    .login(loginRequestModel)
+                                    .then((value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      isApiCallProcess = false;
+                                    });
+
+                                    if (value.token!.isNotEmpty) {
+                                      final snackBar = SnackBar(
+                                          content: Text("Login Successful"));
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductListScreen()));
+                                      // scaffoldKey.currentState
+                                      //     .showSnackBar(snackBar);
+                                    } else {
+                                      final snackBar = SnackBar(
+                                          content:
+                                              Text(value.error.toString()));
+                                      // scaffoldKey.currentState
+                                      //     .showSnackBar(snackBar);
+                                    }
+                                  }
+                                });
+                              }
+                            },
+                            child: Text(
+                              "Login",
+                              style: TextStyle(color: maincolor),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: StadiumBorder()),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                      ],
                     ),
                   ),
                 ),
-              ),
-
-              const SizedBox(height: 50),
-
-              // or continue with
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(
-                        'Or continue with',
-                        style: TextStyle(color: Colors.grey[700]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(
-                        thickness: 0.5,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 50),
-
-              // google + apple sign in buttons
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  // google button
-                  SquareTile(imagePath: 'assets/images/google.png'),
-
-                  SizedBox(width: 25),
-
-                  // apple button
-                  SquareTile(imagePath: 'assets/images/apple.png')
-                ],
-              ),
-
-              const SizedBox(height: 50),
-
-              // not a member? register now
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Not a member?',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                  const SizedBox(width: 4),
-                  const Text(
-                    'Register now',
-                    style: TextStyle(
-                      color: Color.fromRGBO(215, 19, 101, 1),
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
+              ],
+            ),
+            Text(
+              'For Log in Information',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Text('Email: eve.holt@reqres.in'),
+            Text('Password: cityslicka')
+          ],
         ),
       ),
     );
+  }
+
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
   }
 }

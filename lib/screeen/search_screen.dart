@@ -1,10 +1,10 @@
 // ignore_for_file: prefer_const_constructors, prefer_interpolation_to_compose_strings
 
+import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:infinity_box/constant/color.dart';
 import 'package:infinity_box/screeen/cart_list.dart';
-
 import '../model/product_view_model.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -32,11 +32,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     MaterialPageRoute(builder: (context) => CartList()));
               },
               child: Container(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.only(right: 18),
                 child: Row(
                   children: <Widget>[
-                    Icon(Icons.shopping_cart),
-                    Obx(() => Text(productViewModel.count.toString()))
+                    Badge(
+                        badgeColor: Colors.green,
+                        badgeContent: Obx(() => Text(
+                              productViewModel.count.toString(),
+                              style: TextStyle(color: Colors.white),
+                            )),
+                        child: Icon(Icons.shopping_cart)),
                   ],
                 ),
               ),
@@ -72,10 +77,25 @@ class _SearchScreenState extends State<SearchScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
                                 Container(
-                                  height: 200,
-                                  width: double.infinity,
+                                  height: 80,
+                                  width: 70,
                                   child: Image.network(productViewModel
                                       .searchList[index].image!),
+                                ),
+                                GestureDetector(
+                                  onTap: () {},
+                                  child: Container(
+                                    child: Text(
+                                      productViewModel.searchList[index].title!,
+                                      style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 5,
                                 ),
                                 Container(
                                   child: Text(
@@ -84,13 +104,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                             .searchList[index].price!
                                             .toString(),
                                     style: TextStyle(
-                                        fontSize: 20,
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                Container(
-                                  child: Text(
-                                    productViewModel.searchList[index].title!,
                                   ),
                                 ),
                                 Obx(() => productViewModel.cartList.contains(
@@ -112,7 +127,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                               productViewModel
                                                   .searchList[index]);
                                         },
-                                        child: Text("Add to cart")))
+                                        child: Text("Add to cart"))),
+                                SizedBox(
+                                  height: 10,
+                                ),
                               ],
                             );
                           }),
